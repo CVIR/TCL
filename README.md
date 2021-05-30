@@ -2,7 +2,7 @@
 
 This repository contains the implementation details of our Temporal Contrastive Learning (TCL) approach for action recognition in videos.
 
-Ankit Singh*, Omprakash Chakraborty*, Ashutosh Varshney, Rameswar Panda, Rogerio Feris, Kate Saenko and Abir Das, "Semi-Supervised Action Recognition with Temporal Contrastive Learning"
+Ankit Singh*, Omprakash Chakraborty*, Ashutosh Varshney, Rameswar Panda, Rogerio Feris, Kate Saenko and Abir Das, "Semi-Supervised Action Recognition with Temporal Contrastive Learning"\
 *: Equal contributions
 
 If you use the codes and models from this repo, please cite our work. Thanks!
