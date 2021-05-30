@@ -75,7 +75,6 @@ Each dataset folder must contains two sub-folders.
  --shift --shift_div=8 --shift_place=blockres --npb --gpus 0 1  --mu 3 --gamma 9 --gamma_finetune 1 
 --use_group_contrastive --use_finetuning --finetune_start_epoch 350 --sup_thresh 50 --valbatchsize 16 --finetune_lr 0.002`
 
+## Reference
 
-
-
-Thanks to TSM
+1. Lin, Ji, Chuang Gan, and Song Han. "Tsm: Temporal shift module for efficient video understanding." Proceedings of the IEEE/CVF International Conference on Computer Vision. 2019.
