@@ -1,4 +1,4 @@
-## Project Page of Semi-Supervised Action Recognition with Temporal Contrastive Learning [[ArXiv]](https://arxiv.org/pdf/2102.02751.pdf)
+## Project Page of Semi-Supervised Action Recognition with Temporal Contrastive Learning [[Paper]](https://arxiv.org/pdf/2102.02751.pdf)
 
 This repository contains the implementation details of our Temporal Contrastive Learning (TCL) approach for action recognition in videos.
 
