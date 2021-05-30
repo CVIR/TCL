@@ -47,7 +47,7 @@ pip install -r requirements.txt
  `finetune_start_epoch`: from which epoch to start finetuning \
  `finetune_lr`: if want to use different lr other than normal one\
  `gamma_finetune`: weight for pl_loss in finetuning step \
- `finetune_stage_eval_freq`: printing freq for finetuning stage
+ `finetune_stage_eval_freq`: printing freq for finetuning stage\
  `threshold`: used in fine tuning step for selection of labels \
  `sup_thresh`: till which epoch supervised only to be run \
  `percentage`: percentage of unlabeled data e.g 0.99 ,0.95 \
