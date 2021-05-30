@@ -33,28 +33,28 @@ pip install -r requirements.txt
 
 ## Python script overview
 
-main.py - It contains the code for Temporal Contrastive Learning(TCL) with the 2 pathway model.
+`main.py` - It contains the code for Temporal Contrastive Learning(TCL) with the 2 pathway model.
 
-opts.py - It contains the file with default value for different parameter used in 2 pathway model.
+`opts.py` - It contains the file with default value for different parameter used in 2 pathway model.
 
-ops/dataset_config.py - It contains the code for different config for different dataset and their location e.g Kinetics, Jester, SomethingV2
+`ops/dataset_config.py` - It contains the code for different config for different dataset and their location e.g Kinetics, Jester, SomethingV2
 
-ops/dataset.py - It contains the code for how frames are sampled from video
+`ops/dataset.py` - It contains the code for how frames are sampled from video
 
 ### Key Parameters:
- use_group_contrastive: to use group contrastive loss \
- use_finetuning : option to use finetuning at the last \
- finetune_start_epoch: from which epoch to start finetuning \
- finetune_lr: if want to use different lr other than normal one\
- gamma_finetune: weight for pl_loss in finetuning step \
- finetune_stage_eval_freq: printing freq for finetuning stage
- threshold: used in fine tuning step for selection of labels \
- sup_thresh: till which epoch supervised only to be run \
- percentage: percentage of unlabeled data e.g 0.99 ,0.95 \
- gamma: weight of instance contrastive loss \
- lr: starting learning rate \
- mu: ratio of unlabeled to labeled data \
- flip: whether to use horizontal flip in transforms or not
+ `use_group_contrastive`: to use group contrastive loss \
+ `use_finetuning` : option to use finetuning at the last \
+ `finetune_start_epoch`: from which epoch to start finetuning \
+ `finetune_lr`: if want to use different lr other than normal one\
+ `gamma_finetune`: weight for pl_loss in finetuning step \
+ `finetune_stage_eval_freq`: printing freq for finetuning stage
+ `threshold`: used in fine tuning step for selection of labels \
+ `sup_thresh`: till which epoch supervised only to be run \
+ `percentage`: percentage of unlabeled data e.g 0.99 ,0.95 \
+ `gamma`: weight of instance contrastive loss \
+ `lr`: starting learning rate \
+ `mu`: ratio of unlabeled to labeled data \
+ `flip`: whether to use horizontal flip in transforms or not
 
 
 ### Creating Dataset
