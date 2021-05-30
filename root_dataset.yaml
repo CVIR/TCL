@@ -1,0 +1,8 @@
+#root folder where each dataset is contained
+#dataset should contain the frames as well as train and 
+#validation folder as defined in dataset_config
+
+somethingv2: 'datasets/Mini-Something-V2/'
+jester: ''
+kinetics: ''
+charades_ego: ''
