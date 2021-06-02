@@ -1,0 +1,16 @@
+#!/bin/sh
+#$ -cwd
+#PBS -q gpu
+
+export PATH="/home/others/J20180271/anaconda3/bin:$PATH"
+#export PATH="/home/others/J20180271/anaconda3/envs/ADT/bin:$PATH"
+
+which python
+gpustat
+date '+%Y%m%d-%H%M%S'
+
+python main_base.py ucf101 RGB \
+     --arch resnet18 --num_segments 8 \
+     --gd 20 --lr 0.02 --wd 1e-4 --lr_steps 20 40 --epochs 300 --percentage 0.95 \
+     --batch-size 2 -j 16 --dropout 0.5 --consensus_type=avg --eval-freq=1 \
+     --shift --shift_div=8 --shift_place=blockres --npb --gpus 0 1 --gamma 0
