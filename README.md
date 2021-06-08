@@ -1,4 +1,4 @@
-## Project Page of Semi-Supervised Action Recognition with Temporal Contrastive Learning [[Paper]](https://arxiv.org/pdf/2102.02751.pdf)
+## Project Page of Semi-Supervised Action Recognition with Temporal Contrastive Learning [[Paper]](https://arxiv.org/pdf/2102.02751.pdf) [[Website]](https://cvir.github.io/TCL/)
 
 This repository contains the implementation details of our Temporal Contrastive Learning (TCL) approach for action recognition in videos.
 
@@ -17,19 +17,46 @@ If you use the codes and models from this repo, please cite our work. Thanks!
 }
 ```
 
-### Prerequisites
-- Python 3.X
-- PyTorch 1.X
-- torchvision
-- pyyaml
-
-For video data pre-processing, you may need ffmpeg.
-
-
 ## Requirements
 ```
 pip install -r requirements.txt
 ```
+## Data Preparation
+
+The dataloader (ops/dataset.py) can load videos (image sequences) stored in the following format:
+```
+-- dataset_dir
+---- data
+------category.txt  
+------train.txt
+------val.txt 
+---- Frames
+------ video_0_folder
+-------- 00001.jpg
+-------- 00002.jpg
+-------- ...
+------ video_1_folder
+------ ...
+```
+For each dataset, `root_dataset.yaml` should contain the `dataset_dir` where each dataset is stored
+
+
+Each line in `train.txt` and `val.txt` includes 4 elements and separated by a symbol, e.g. space or semicolon. 
+Four elements (in order) include (1)relative paths to `video_x_folder` from `dataset_dir`, (2) starting frame number, usually 1, (3) ending frame number, (4) label id (a numeric number).
+
+E.g., a `video_x` has `300` frames and belong to label `1`.
+```
+path/to/video_x_folder 1 300 1
+```
+
+After that, in the ops/dataset_config.py, the location paths of `category.txt`, `Frames`, `train.txt` and `val.txt` should be included accordingly.
+
+Samples for some datasets are already mentioned in the respective files.
+
+We provided three scripts in the `tools` folder to help convert some datasets but the details in the scripts must be set accordingly. E.g., the path to videos.
+
+## Mini-datasets
+We provide the [`category.txt`](datasets/Mini-Something-V2/data/category.txt), [`train.txt`](datasets/Mini-Something-V2/data/train.txt) and [`val.txt`](datasets/Mini-Something-V2/data/val.txt) for the Mini-Something-Something V2 dataset.
 
 ## Python script overview
 
@@ -57,12 +84,6 @@ pip install -r requirements.txt
  `flip`: whether to use horizontal flip in transforms or not
 
 
-### Creating Dataset
-The `root_dataset.yaml` must contains the root folder of the particular dataset.
-Each dataset folder must contains two sub-folders.
-- Frames: This sub-folder contains the extracted Frames of the videos from the dataset. To extract frames from videos, Please refer to [TSM](https://github.com/mit-han-lab/temporal-shift-module#data-preparation)
-- data: This sub-folder contains the training,validation split files along with the file containing the list of all the classes of the videos.These names should be consistent with `ops/dataset_config.py`. Samples files are provided in the dataset folder.
-
 ### Training TCL
 - For running `x%` labeled data scenario, it expects to have a folder named `Run_x` where all the labeled and unlabeled data will be split as per the input seed.
 - All the models and logs will be stored inside a sub folder of checkpoints directory. A different subfolder will be created on each execution.
@@ -76,5 +97,8 @@ Each dataset folder must contains two sub-folders.
 --use_group_contrastive --use_finetuning --finetune_start_epoch 350 --sup_thresh 50 --valbatchsize 16 --finetune_lr 0.002`
 
 ## Reference
+
+The implementation is largely borrowed from [TSM](https://github.com/mit-han-lab/temporal-shift-module)[1].
+
 
 1. Lin, Ji, Chuang Gan, and Song Han. "Tsm: Temporal shift module for efficient video understanding." Proceedings of the IEEE/CVF International Conference on Computer Vision. 2019.
