@@ -88,7 +88,7 @@ We provide the [`category.txt`](datasets/Mini-Something-V2/data/category.txt), [
 - For running `x%` labeled data scenario, it expects to have a folder named `Run_x` where all the labeled and unlabeled data will be split as per the input seed.
 - All the models and logs will be stored inside a sub folder of checkpoints directory. A different subfolder will be created on each execution.
 
-### Sample Code to Run for 2 stream final approach:
+### Sample Code to train TCL
 
 `python main.py somethingv2 RGB --seed 123 --strategy classwise
  --arch resnet18 --num_segments 8 --second_segments 4 --threshold 0.8 --gd 20 --lr 0.02 --wd 1e-4 
