@@ -98,7 +98,7 @@ We provide the [`category.txt`](datasets/Mini-Something-V2/data/category.txt), [
 
 ## Reference
 
-The implementation is largely borrowed from [TSM](https://github.com/mit-han-lab/temporal-shift-module)[1].
+The implementation reused some portions from [TSM](https://github.com/mit-han-lab/temporal-shift-module)[1].
 
 
 1. Lin, Ji, Chuang Gan, and Song Han. "Tsm: Temporal shift module for efficient video understanding." Proceedings of the IEEE/CVF International Conference on Computer Vision. 2019.
