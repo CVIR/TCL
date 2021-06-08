@@ -7,8 +7,6 @@ def get_rootdataset(dataset):
         dataset_path = yaml.load(file, Loader=yaml.FullLoader)
         return dataset_path[dataset]
 
-# ROOT_DATASET = '/scratch/something-something_v2/' # '/home/faculty/adas/datasets/UCF-101/'  # '/data/jilin/'
-
 
 def return_ucf101(modality):
     filename_categories = 'data/classInd.txt'
