@@ -75,11 +75,6 @@ parser.add_argument('--eval-freq', '-ef', default=5, type=int,
                     metavar='N', help='evaluation frequency (default: 5)')
 parser.add_argument('--seed', default=123, type=int,
                     help='seed for labeled and unlabeled data separation')
-
-#=========================config for MixMatch =========================
-parser.add_argument('--alpha', type=float, default=0.75)                                                    
-parser.add_argument('--consistency_rampup',type=float, default=50)                                          
-parser.add_argument('--ema_decay',type=float, default=0.999) 
 # ========================= Runtime Configs ==========================
 parser.add_argument('-j', '--workers', default=8, type=int, metavar='N',
                     help='number of data loading workers (default: 8)')
