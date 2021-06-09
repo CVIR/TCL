@@ -37,16 +37,11 @@ def main():
 
     num_class, args.train_list, args.val_list, args.root_path, prefix = dataset_config.return_dataset(args.dataset,args.modality)
     full_arch_name = args.arch
-    #if args.shift:
-    #    full_arch_name += '_shift{}_{}'.format(
-    #        args.shift_div, args.shift_place)
     if args.temporal_pool:
         full_arch_name += '_tpool'
     args.store_name = '_'.join(
         ['TCL', datetime.datetime.now().strftime("%Y%m%d-%H%M%S"), args.dataset, full_arch_name, 'p%.2f' % args.percentage,'th%.2f' % args.threshold,'gamma%0.2f' % args.gamma,'mu%0.2f'% args.mu,'seed%d' % args.seed,'seg%d' % args.num_segments, 'bs%d' % args.batch_size,
          'e{}'.format(args.epochs)])
-    #if args.pretrain != 'imagenet':
-    #    args.store_name += '_{}'.format(args.pretrain)
     if args.dense_sample:
         args.store_name += '_dense'
     if args.non_local > 0:
@@ -78,8 +73,6 @@ def main():
     input_mean = model.input_mean
     input_std = model.input_std
     policies = model.get_optim_policies()
-    # train_augmentation = model.get_augmentation(
-    #     flip=True if 'something' in args.dataset or 'jester' in args.dataset else True)
     train_augmentation = model.get_augmentation(flip=args.flip)
 
     model = torch.nn.DataParallel(model, device_ids=args.gpus).cuda()
@@ -128,8 +121,6 @@ def main():
         if args.dataset not in args.tune_from:  # new dataset
             print('=> New dataset, do not load fc weights')
             sd = {k: v for k, v in sd.items() if 'fc' not in k}
-        # if args.modality == 'Flow' and 'Flow' not in args.tune_from:
-        #     sd = {k: v for k, v in sd.items() if 'conv1.weight' not in k}
         model_dict.update(sd)
         model.load_state_dict(model_dict)
 
@@ -248,7 +239,6 @@ def main():
             # remember best prec@1 and save checkpoint
             is_best = prec1 > best_prec1
             best_prec1 = max(prec1, best_prec1)
-            #tf_writer.add_scalar('acc/test_top1_best', best_prec1, epoch)
 
             output_best = 'Best Prec@1: %.3f\n' % (best_prec1)
             print(output_best)
