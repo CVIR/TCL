@@ -19,9 +19,7 @@ from ops import dataset_config
 from ops.utils import AverageMeter, accuracy
 from ops.temporal_shift import make_temporal_pool
 
-
 best_prec1 = 0
-
 
 
 def main():
@@ -30,10 +28,8 @@ def main():
     args = parser.parse_args()
 
     ##asset check ####
-    if args.use_uns_learning:
-        assert args.uns_learn_epochs < args.pseudo_thresh
-    if args.use_one_stage_pl:
-        assert args.pl_start_epoch > args.pseudo_thresh
+    if args.use_finetuning:
+        assert args.finetune_start_epoch > args.sup_thresh
 
     num_class, args.train_list, args.val_list, args.root_path, prefix = dataset_config.return_dataset(args.dataset,args.modality)
     full_arch_name = args.arch
@@ -219,11 +215,11 @@ def main():
     default_start = 0
     is_finetune_lr_set= False
     for epoch in range(args.start_epoch, args.epochs):
-        if args.use_one_stage_pl and epoch >= args.pl_start_epoch:
-            args.eval_freq = args.pl_stage_eval_freq
-        if args.use_one_stage_pl and epoch >= args.pl_start_epoch and args.finetune_lr > 0.0 and not is_finetune_lr_set:
+        if args.use_finetuning and epoch >= args.finetune_start_epoch:
+            args.eval_freq = args.finetune_stage_eval_freq
+        if args.use_finetuning and epoch >= args.finetune_start_epoch and args.finetune_lr > 0.0 and not is_finetune_lr_set:
             args.lr = args.finetune_lr
-            default_start = args.pl_start_epoch
+            default_start = args.finetune_start_epoch
             is_finetune_lr_set = True
         adjust_learning_rate(optimizer, epoch, args.lr_type, args.lr_steps,default_start, using_policy=True)
 
@@ -232,7 +228,7 @@ def main():
               criterion, optimizer, epoch, log_training)
 
         # evaluate on validation set
-        if (not args.use_uns_learning or epoch >= args.uns_learn_epochs) and ((epoch + 1) % args.eval_freq == 0 or epoch == (args.epochs - 1) or (epoch+1)== args.pl_start_epoch) :
+        if ((epoch + 1) % args.eval_freq == 0 or epoch == (args.epochs - 1) or (epoch+1)== args.finetune_start_epoch) :
             prec1 = validate(val_loader, model, criterion,
                              epoch, log_training)
 
@@ -244,7 +240,7 @@ def main():
             print(output_best)
             log_training.write(output_best + '\n')
             log_training.flush()
-            if args.use_one_stage_pl and (epoch+1)== args.pl_start_epoch:
+            if args.use_finetuning and (epoch+1) == args.finetune_start_epoch:
                 one_stage_pl=True
             else:
                 one_stage_pl = False
@@ -262,10 +258,9 @@ def train(labeled_trainloader, unlabeled_trainloader, model, criterion, optimize
     data_time = AverageMeter()
     total_losses = AverageMeter()
     supervised_losses = AverageMeter()
-    consistency_losses = AverageMeter()
-    group_consistency_losses = AverageMeter()
+    contrastive_losses = AverageMeter()
+    group_contrastive_losses = AverageMeter()
     pl_losses = AverageMeter()
-    uns_learning_losses = AverageMeter()
     top1 = AverageMeter()
     top5 = AverageMeter()
 
@@ -278,7 +273,7 @@ def train(labeled_trainloader, unlabeled_trainloader, model, criterion, optimize
 
     # switch to train mode
     model.train()
-    if epoch >= args.pseudo_thresh or (args.use_uns_learning and epoch < args.uns_learn_epochs) or (args.use_one_stage_pl and epoch >= args.pl_start_epoch):
+    if epoch >= args.sup_thresh or (args.use_finetuning and epoch >= args.finetune_start_epoch):
         data_loader = zip(labeled_trainloader, unlabeled_trainloader)
     else:
         data_loader = labeled_trainloader
@@ -289,36 +284,32 @@ def train(labeled_trainloader, unlabeled_trainloader, model, criterion, optimize
         # measure data loading time
         data_time.update(time.time() - end)
         #reseting losses
-        consistency_loss = torch.tensor(0.0).cuda()
-        uns_learning_loss = torch.tensor(0.0).cuda()
+        contrastive_loss = torch.tensor(0.0).cuda()
         pl_loss = torch.tensor(0.0).cuda()
         loss = torch.tensor(0.0).cuda()
-        group_consistency_loss = torch.tensor(0.0).cuda()
+        group_contrastive_loss = torch.tensor(0.0).cuda()
 
-        if epoch >= args.pseudo_thresh or (args.use_uns_learning and epoch < args.uns_learn_epochs) or (args.use_one_stage_pl and epoch >= args.pl_start_epoch):
+        if epoch >= args.sup_thresh  or (args.use_finetuning and epoch >= args.finetune_start_epoch):
             
             (labeled_data,unlabeled_data) =data
-            input, target = labeled_data
             images_fast, images_slow = unlabeled_data
             images_slow = images_slow.cuda()
             images_fast = images_fast.cuda()
             images_slow = torch.autograd.Variable(images_slow)
             images_fast = torch.autograd.Variable(images_fast)
 
-            # consistency_loss
+            # contrastive_loss
             output_fast = model(images_fast)
-            if not args.use_one_stage_pl or epoch < args.pl_start_epoch:
+            if not args.use_finetuning or epoch < args.finetune_start_epoch:
                 output_slow = model(images_slow, unlabeled=True)
             output_fast_detach = output_fast.detach()
-            if args.use_uns_learning  and epoch < args.uns_learn_epochs:
-                uns_learning_loss = simclr_loss(torch.softmax(output_fast,dim=1),torch.softmax(output_slow,dim=1))
-            elif epoch >= args.pseudo_thresh and epoch < args.pl_start_epoch:
-                consistency_loss = simclr_loss(torch.softmax(output_fast_detach,dim=1),torch.softmax(output_slow,dim=1))
-                if args.use_group_consistency:
+            if epoch >= args.sup_thresh and epoch < args.finetune_start_epoch:
+                contrastive_loss = simclr_loss(torch.softmax(output_fast_detach,dim=1),torch.softmax(output_slow,dim=1))
+                if args.use_group_contrastive:
                     grp_unlabeled_8seg = get_group(output_fast_detach)
                     grp_unlabeled_4seg = get_group(output_slow)
-                    group_consistency_loss = compute_group_consistency_loss(grp_unlabeled_8seg,grp_unlabeled_4seg) 
-            elif args.use_one_stage_pl  and epoch >= args.pl_start_epoch:
+                    group_contrastive_loss = compute_group_contrastive_loss(grp_unlabeled_8seg,grp_unlabeled_4seg) 
+            elif args.use_finetuning  and epoch >= args.finetune_start_epoch:
                 pseudo_label = torch.softmax(output_fast_detach, dim=-1)
                 max_probs, targets_pl = torch.max(pseudo_label, dim=-1)
                 mask = max_probs.ge(args.threshold).float()
@@ -328,29 +319,25 @@ def train(labeled_trainloader, unlabeled_trainloader, model, criterion, optimize
                                                     reduction='none') * mask).mean()
         else:
             labeled_data = data
-            input, target = labeled_data
+        input, target = labeled_data
+        target = target.cuda()
+        input = input.cuda()
+        input = torch.autograd.Variable(input)
+        target_var = torch.autograd.Variable(target)
+        output = model(input)
+        loss = criterion(output, target_var)
 
-        if not args.use_uns_learning or epoch >= args.uns_learn_epochs:
-            target = target.cuda()
-            input = input.cuda()
-            input = torch.autograd.Variable(input)
-            target_var = torch.autograd.Variable(target)
-            output = model(input)
-            loss = criterion(output, target_var)
-
-
-        total_loss = loss + args.gamma*consistency_loss + uns_learning_loss + group_consistency_loss + args.gamma_pl*pl_loss
+        total_loss = loss + args.gamma*contrastive_loss  + group_contrastive_loss + args.gamma_finetune*pl_loss
         # measure accuracy and record loss
-        if not args.use_uns_learning or epoch >= args.uns_learn_epochs:
-            prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
+        prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
+        if epoch >= args.sup_thresh:
+            total_losses.update(total_loss.item(), input.size(0)+args.mu*input.size(0))
         else:
-            prec1, prec5 =torch.tensor(0.0) ,torch.tensor(0.0)
-        total_losses.update(total_loss.item(), input.size(0))
+            total_losses.update(total_loss.item(), input.size(0))
         supervised_losses.update(loss.item(), input.size(0))
-        consistency_losses.update(consistency_loss.item(), input.size(0))
-        group_consistency_losses.update(group_consistency_loss.item(), input.size(0))
-        pl_losses.update(pl_loss.item(), input.size(0))
-        uns_learning_losses.update(uns_learning_loss.item(),input.size(0))
+        contrastive_losses.update(contrastive_loss.item(), input.size(0)+args.mu*input.size(0))
+        group_contrastive_losses.update(group_contrastive_loss.item(), input.size(0)+args.mu*input.size(0))
+        pl_losses.update(pl_loss.item(), input.size(0)+args.mu*input.size(0))
         top1.update(prec1.item(), input.size(0))
         top5.update(prec5.item(), input.size(0))
 
@@ -373,16 +360,15 @@ def train(labeled_trainloader, unlabeled_trainloader, model, criterion, optimize
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                       'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
                       'TotalLoss {total_loss.val:.4f} ({total_loss.avg:.4f})\t'
-                      'Uns_learning_loss {uns_learning_loss.val:.4f} ({uns_learning_loss.avg:.4f})\t'
                       'Supervised Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                      'Consistency_Loss {consistency_loss.val:.4f} ({consistency_loss.avg:.4f})\t'
-                      'Group_consistency_Loss {group_consistency_loss.val:.4f} ({group_consistency_loss.avg:.4f})\t'
+                      'Contrastive_Loss {contrastive_loss.val:.4f} ({contrastive_loss.avg:.4f})\t'
+                      'Group_contrastive_Loss {group_contrastive_loss.val:.4f} ({group_contrastive_loss.avg:.4f})\t'
                       'Pseudo_Loss {pl_loss.val:.4f} ({pl_loss.avg:.4f})\t'
                       'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
                       'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
                           epoch, i, batch_time=batch_time,
-                          data_time=data_time, total_loss=total_losses, uns_learning_loss= uns_learning_losses , loss=supervised_losses,
-                          consistency_loss=consistency_losses,group_consistency_loss=group_consistency_losses,pl_loss=pl_losses, top1=top1, top5=top5, lr=optimizer.param_groups[-1]['lr'] * 0.1))  # TODO
+                          data_time=data_time, total_loss=total_losses,loss=supervised_losses,
+                          contrastive_loss=contrastive_losses,group_contrastive_loss=group_contrastive_losses,pl_loss=pl_losses, top1=top1, top5=top5, lr=optimizer.param_groups[-1]['lr'] * 0.1))  # TODO
             print(output)
             log.write(output + '\n')
             log.flush()
@@ -448,7 +434,7 @@ def get_group(output):
         groups[x.item()]= group
     return groups
 
-def compute_group_consistency_loss(grp_dict_un,grp_dict_lab):
+def compute_group_contrastive_loss(grp_dict_un,grp_dict_lab):
     loss = []
     l_fast =[]
     l_slow =[]
@@ -564,46 +550,10 @@ def split_file(file, unlabeled, labeled, percentage, isShuffle=True, seed=123, s
                      i += 1
                 else:
                      foutSmall.write(line)
-                     
-    if strategy == 'kshot':
-        assert args.kshot_val >0
-        if os.path.exists(unlabeled) and os.path.exists(labeled):
-            print("path exists with this seed and strategy")
-            return             
-        random.seed(seed)
-        #creating dictionary against each category for K shot splitting
-        def del_list(list_delete,indices_to_delete):
-            for i in sorted(indices_to_delete, reverse=True):
-                del(list_delete[i])
-
-        main_dict= defaultdict(list)
-        with open(file,'r') as mainfile:
-            lines = mainfile.readlines()
-            for line in lines:
-                video_info = line.strip().split()
-                main_dict[video_info[2]].append((video_info[0],video_info[1]))
-        with open(unlabeled,'w') as ul,\
-            open(labeled,'w') as l:
-            for key,value in main_dict.items():
-                length_videos = len(value)
-                ul_no_videos = length_videos - args.kshot_val
-                indices = random.sample(range(length_videos),ul_no_videos)
-                for index in indices:
-                    line_to_written = value[index][0] + " " + value[index][1] + " " +key+"\n"
-                    ul.write(line_to_written)
-                del_list(value,indices)
-                for label_index in range(len(value)):
-                    line_to_written = value[label_index][0] + " " + value[label_index][1] + " " +key+"\n"
-                    l.write(line_to_written)
-
 
 def get_training_filenames(train_file_path):
-    if not args.strategy == 'kshot':
-        labeled_file_path = os.path.join("Run_"+str(int(np.round((1-args.percentage)*100))),args.dataset+'_'+str(args.seed)+args.strategy+"_labeled_training.txt")
-        unlabeled_file_path = os.path.join("Run_"+str(int(np.round((1-args.percentage)*100))),args.dataset+'_'+str(args.seed)+args.strategy+"_unlabeled_training.txt")
-    else:
-        labeled_file_path = os.path.join("kshot",args.dataset+'_'+str(args.kshot_val)+str(args.seed)+args.strategy+"_labeled_training.txt")
-        unlabeled_file_path = os.path.join("kshot",args.dataset+'_'+str(args.kshot_val)+str(args.seed)+args.strategy+"_unlabeled_training.txt")
+    labeled_file_path = os.path.join("Run_"+str(int(np.round((1-args.percentage)*100))),args.dataset+'_'+str(args.seed)+args.strategy+"_labeled_training.txt")
+    unlabeled_file_path = os.path.join("Run_"+str(int(np.round((1-args.percentage)*100))),args.dataset+'_'+str(args.seed)+args.strategy+"_unlabeled_training.txt")
     split_file(train_file_path, unlabeled_file_path,
                labeled_file_path,args.percentage, isShuffle=True,seed=args.seed, strategy=args.strategy)
     return labeled_file_path, unlabeled_file_path

@@ -66,7 +66,6 @@ class TSNDataSet(data.Dataset):
                 return [Image.open(os.path.join(self.root_path, directory, self.image_tmpl.format(1))).convert('RGB')]
 
     def _parse_list(self):
-        # check the frame number is large >3:
         tmp = [x.strip().split(' ') for x in open(self.list_file)]
         if not self.test_mode or self.remove_missing:
             tmp = [item for item in tmp if int(item[1]) >= 3]
@@ -113,7 +112,6 @@ class TSNDataSet(data.Dataset):
                 offsets = np.array([int(tick / 2.0 + tick * x) for x in range(num_segments)])
             else:
                 offsets = np.zeros((num_segments,))
-            #print("length of no of val frames is {}".format(offsets+1))
             return offsets + 1
 
     def _get_test_indices(self, record,num_segments):
@@ -130,13 +128,11 @@ class TSNDataSet(data.Dataset):
 
             offsets = np.array([int(tick / 2.0 + tick * x) for x in range(num_segments)] +
                                [int(tick * x) for x in range(num_segments)])
-            #print("length of no of test frames is {}".format(offsets+1))
 
             return offsets + 1
         else:
             tick = (record.num_frames - self.new_length + 1) / float(num_segments)
             offsets = np.array([int(tick / 2.0 + tick * x) for x in range(num_segments)])
-            #print("length of no of test frames is {}".format(offsets+1))
             return offsets + 1
 
     def __getitem__(self, index):
@@ -165,8 +161,6 @@ class TSNDataSet(data.Dataset):
                 if self.unlabeled:
                     segment_indices_fast = self._sample_indices(record,self.num_segments)
                     segment_indices_slow = self._sample_indices(record, self.second_segments)
-                    #print ("length of fast segment_indices_fast {}".format(segment_indices_fast))
-                    #print("length of slow segment_indices_slow {}". format(segment_indices_slow))
                     fast_data,_ = self.get(record, segment_indices_fast)
                     slow_data,_= self.get(record,segment_indices_slow)
                     return fast_data,slow_data
