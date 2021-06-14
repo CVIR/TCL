@@ -43,6 +43,31 @@
     -webkit-border-radius: 10px ;
   }
 
+  .link2 {
+    text-decoration: none;
+    display: inline;
+    margin-right: 5px;
+  }
+  .fakelink {
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  element.style {
+    overflow: hidden;
+    display: block;
+  }
+  .pre-white-space {
+    white-space: pre;
+  }
+  .bibref {
+    margin-top: 10px;
+    margin-left: 10px;
+    display: none;
+    font-size: 14px;
+    font-family: monospace;
+  }
+
   img.rounded {
     border: 1px solid #eeeeee;
     border-radius: 10px ;
@@ -195,7 +220,7 @@
 
 
         
-        <center id="sourceCode"><h1>Paper and Code</h1></center>
+        <center id="sourceCode"><h1>Paper, code and other details</h1></center>
 
 
         <table align=center width=900px>
@@ -206,7 +231,22 @@
           </td>
           <td></td>
           <td width=700px > <span style="font-size:20px">
-            Ankit Singh, Omprakash Chakraborty, Ashutosh Varshney, Rameswar Panda, Rogerio Feris, Kate Saenko, Abir Das<br/> <a href="https://cvir.github.io/TCL">Semi-Supervised Action Recognition with Temporal Contrastive Learning</a> <br/> <i>Computer Vision and Pattern Recognition (CVPR)</i>, 2021 <br/>[<a href="https://arxiv.org/pdf/2102.02751.pdf">PDF</a>][<a href="https://cvir.github.io/TCL/">Code (Coming Soon) </a>]</span>
+            Ankit Singh*, Omprakash Chakraborty*, Ashutosh Varshney, Rameswar Panda, Rogerio Feris, Kate Saenko, Abir Das<br/> <a href="https://arxiv.org/pdf/2102.02751.pdf">Semi-Supervised Action Recognition with Temporal Contrastive Learning</a> <br/> <i>Computer Vision and Pattern Recognition (CVPR)</i>, 2021 <br/>[<a href="https://openaccess.thecvf.com/content/CVPR2021/papers/Singh_Semi-Supervised_Action_Recognition_With_Temporal_Contrastive_Learning_CVPR_2021_paper.pdf">PDF</a>]
+            [<a href="https://github.com/CVIR/TCL">Code</a>]
+            <div class="link2">[<a class="fakelink" onclick="$(this).siblings('.bibref').slideToggle()">Bibtex</a>]
+<div class="bibref pre-white-space" style="overflow: hidden; display: none;">@InProceedings{Singh_2021_CVPR,
+    author    = {Singh, Ankit and Chakraborty, Omprakash and Varshney, Ashutosh and Panda, Rameswar and Feris, Rogerio and Saenko, Kate and Das, Abir},
+    title     = {Semi-Supervised Action Recognition With Temporal Contrastive Learning},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    month     = {June},
+    year      = {2021},
+    pages     = {10389-10399}
+}</div>
+</div>
+[<a href="https://www.youtube.com/watch?v=_qIYu3EU2kY">Video Presentation</a>]
+[<a href="">Poster</a>]
+
+</span>
         </td>
         </tr>
 
