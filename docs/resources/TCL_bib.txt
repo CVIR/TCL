@@ -1,0 +1,8 @@
+@InProceedings{Singh_2021_CVPR,
+    author    = {Singh, Ankit and Chakraborty, Omprakash and Varshney, Ashutosh and Panda, Rameswar and Feris, Rogerio and Saenko, Kate and Das, Abir},
+    title     = {Semi-Supervised Action Recognition With Temporal Contrastive Learning},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    month     = {June},
+    year      = {2021},
+    pages     = {10389-10399}
+}
