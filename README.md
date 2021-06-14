@@ -8,12 +8,13 @@ Ankit Singh*, Omprakash Chakraborty*, Ashutosh Varshney, Rameswar Panda, Rogerio
 If you use the codes and models from this repo, please cite our work. Thanks!
 
 ```
-@inproceedings{singh2021semi,
-    title={Semi-Supervised Action Recognition with Temporal Contrastive Learning},
-    author={Singh, Ankit and Chakraborty, Omprakash and Varshney, Ashutosh and Panda, Rameswar and Feris, Rogerio and Saenko, Kate and Das, Abir},
-    booktitle = {The IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
-    year = {2021},
-    month = jun
+@InProceedings{Singh_2021_CVPR,
+    author    = {Singh, Ankit and Chakraborty, Omprakash and Varshney, Ashutosh and Panda, Rameswar and Feris, Rogerio and Saenko, Kate and Das, Abir},
+    title     = {Semi-Supervised Action Recognition With Temporal Contrastive Learning},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    month     = {June},
+    year      = {2021},
+    pages     = {10389-10399}
 }
 ```
 
