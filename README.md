@@ -42,7 +42,7 @@ The dataloader (ops/dataset.py) can load videos (image sequences) stored in the 
 For each dataset, `root_dataset.yaml` should contain the `dataset_dir` where each dataset is stored
 
 
-Each line in `train.txt` and `val.txt` includes 3 elements and separated by a symbol, e.g. space. 
+Each line in `train.txt` and `val.txt` includes 3 elements and separated by space. 
 Four elements (in order) include (1)relative paths to `video_x_folder` from `dataset_dir`, (2) total number of frames, (3) label id (a numeric number).
 
 E.g., a `video_x` has `300` frames and belong to label `1`.
