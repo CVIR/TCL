@@ -19,6 +19,7 @@ If you use the codes and models from this repo, please cite our work. Thanks!
 ```
 
 ## Requirements
+The code is written for Pytorch 3.6.10, but should work for other version with some modifications.
 ```
 pip install -r requirements.txt
 ```
