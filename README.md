@@ -43,11 +43,11 @@ For each dataset, `root_dataset.yaml` should contain the `dataset_dir` where eac
 
 
 Each line in `train.txt` and `val.txt` includes 4 elements and separated by a symbol, e.g. space or semicolon. 
-Four elements (in order) include (1)relative paths to `video_x_folder` from `dataset_dir`, (2) starting frame number, usually 1, (3) ending frame number, (4) label id (a numeric number).
+Four elements (in order) include (1)relative paths to `video_x_folder` from `dataset_dir`, (2) ending frame number, (3) label id (a numeric number).
 
 E.g., a `video_x` has `300` frames and belong to label `1`.
 ```
-path/to/video_x_folder 1 300 1
+path/to/video_x_folder 300 1
 ```
 
 After that, in the ops/dataset_config.py, the location paths of `category.txt`, `Frames`, `train.txt` and `val.txt` should be included accordingly.
