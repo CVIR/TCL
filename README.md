@@ -55,7 +55,7 @@ After that, in the ops/dataset_config.py, the location paths of `category.txt`, 
 
 Samples for some datasets are already mentioned in the respective files.
 
-We provided three scripts in the `tools` folder to help convert some datasets but the details in the scripts must be set accordingly. E.g., the path to videos.
+We provided three sample scripts in the `tools` folder to help convert some datasets but the details in the scripts must be set accordingly. E.g., the path to videos.
 
 ## Mini-datasets
 We provide the [`category.txt`](datasets/Mini-Something-V2/data/category.txt), [`train.txt`](datasets/Mini-Something-V2/data/train.txt) and [`val.txt`](datasets/Mini-Something-V2/data/val.txt) for the Mini-Something-Something V2 dataset.
